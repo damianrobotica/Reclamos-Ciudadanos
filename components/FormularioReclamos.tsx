@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { MessageSquare, Link2, FileText, Plus, X, Upload, ImageIcon, MapPin } from "lucide-react"
+import { MessageSquare, Link2, FileText, Plus, X, Upload, MapPin } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -24,6 +24,7 @@ import { collection, addDoc } from "firebase/firestore"
 import { useDropzone } from "react-dropzone"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast } from "@/components/ui/use-toast"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 const esquemaFormulario = z.object({
   nombre: z.string().min(2, {
@@ -79,6 +80,8 @@ export function FormularioReclamos() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
   const [isCapturingLocation, setIsCapturingLocation] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [reclamoId, setReclamoId] = useState<string | null>(null)
 
   useEffect(() => {
     const style = document.createElement("style")
@@ -263,7 +266,7 @@ export function FormularioReclamos() {
       )
 
       // Prepare data for Firestore
-      const reclamoData = {
+      const reclamoData: any = {
         nombre: values.nombre,
         dni: values.dni,
         email: values.email,
@@ -275,9 +278,19 @@ export function FormularioReclamos() {
         descripcion: values.descripcion,
         recibirNotificaciones: values.recibirNotificaciones,
         archivos: imageUrls,
-        ubicacion: values.ubicacion,
+        ubicacion: {
+          texto: values.ubicacion.texto,
+        },
         fechaCreacion: new Date().toISOString(),
         estado: "Pendiente",
+      }
+
+      // Only include coordinates if they are defined
+      if (values.ubicacion.coordenadas?.latitud !== undefined && values.ubicacion.coordenadas?.longitud !== undefined) {
+        reclamoData.ubicacion.coordenadas = {
+          latitud: values.ubicacion.coordenadas.latitud,
+          longitud: values.ubicacion.coordenadas.longitud,
+        }
       }
 
       // Log the data being sent to Firestore
@@ -286,11 +299,10 @@ export function FormularioReclamos() {
       // Add document to Firestore
       const docRef = await addDoc(collection(db, "reclamos"), reclamoData)
       console.log("Reclamo guardado con ID: ", docRef.id)
-      toast({
-        title: "Reclamo enviado",
-        description: "Su reclamo ha sido enviado con éxito.",
-        duration: 5000,
-      })
+
+      // Set the reclamo ID and open the dialog
+      setReclamoId(docRef.id)
+      setIsDialogOpen(true)
 
       // Reset the form
       form.reset()
@@ -700,6 +712,32 @@ export function FormularioReclamos() {
           </form>
         </Form>
       </CardContent>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reclamo Enviado Exitosamente</DialogTitle>
+            <DialogDescription>Su reclamo ha sido recibido y procesado correctamente.</DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            <p className="text-sm text-gray-500">
+              Gracias por comunicarse con nosotros. Su reclamo ha sido registrado en nuestro sistema.
+            </p>
+            <p className="mt-2 font-semibold">
+              Número de seguimiento: <span className="text-blue-600">{reclamoId}</span>
+            </p>
+            <p className="mt-4 text-sm text-gray-500">
+              Por favor, guarde este número para futuras referencias. Lo utilizará para consultar el estado de su
+              reclamo.
+            </p>
+          </div>
+          <Button
+            className="mt-4 w-full bg-custom-blue hover:bg-custom-blue-dark text-white"
+            onClick={() => setIsDialogOpen(false)}
+          >
+            Entendido
+          </Button>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }
