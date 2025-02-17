@@ -1,6 +1,5 @@
 import { initializeApp } from "firebase/app"
 import { getFirestore } from "firebase/firestore"
-import { getAnalytics } from "firebase/analytics"
 import { getAuth } from "firebase/auth"
 
 const firebaseConfig = {
@@ -16,8 +15,16 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
-const analytics = getAnalytics(app)
 const auth = getAuth(app)
+
+// Initialize Analytics only on client side
+let analytics = null
+if (typeof window !== "undefined") {
+  // Dynamic import to avoid server-side initialization
+  import("firebase/analytics").then((module) => {
+    analytics = module.getAnalytics(app)
+  })
+}
 
 export { db, analytics, auth }
 
