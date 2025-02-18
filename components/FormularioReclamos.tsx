@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { MessageSquare, Link2, FileText, Plus, X, Upload, MapPin } from "lucide-react"
+import { MessageSquare, Link2, FileText, Plus, X, Upload, MapPin, ExternalLink } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -25,6 +25,8 @@ import { useDropzone } from "react-dropzone"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+
+const TUTORIAL_LINK = "https://drive.google.com/file/d/1DCD69aNzXheFY_MA6oNxuuHexdJcVhSw/view"
 
 const esquemaFormulario = z.object({
   nombre: z.string().min(2, {
@@ -73,6 +75,18 @@ const esquemaFormulario = z.object({
 const CLOUDINARY_CLOUD_NAME = "deemssikv"
 const CLOUDINARY_API_KEY = "925322665111847"
 const CLOUDINARY_API_SECRET = "YmeBc6v5ehZy1DlfgL_gQc2XOwc"
+
+const FloatingButton = () => (
+  <a
+    href={TUTORIAL_LINK}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="fixed top-4 right-4 z-50 bg-custom-blue hover:bg-custom-blue-dark text-white font-bold py-2 px-4 rounded-full shadow-lg flex items-center transition-colors duration-200"
+  >
+    Ver tutorial
+    <ExternalLink className="ml-2 h-4 w-4" />
+  </a>
+)
 
 export function FormularioReclamos() {
   const [sector, setSector] = useState("")
@@ -348,207 +362,182 @@ export function FormularioReclamos() {
   }
 
   return (
-    <Card className="w-full max-w-3xl mx-auto bg-white shadow-lg">
-      <div className="bg-custom-blue text-white p-3 rounded-t-lg text-center text-sm font-medium">
-        SOLICITUD DE RECLAMOS - MUNICIPALIDAD ELDORADO
-      </div>
-      <CardHeader className="pb-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Nuevo Reclamo</h2>
-          <span className="text-gray-500 text-sm">
-            {new Date().toLocaleDateString("es-AR", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })}
-          </span>
+    <>
+      <FloatingButton />
+      <Card className="w-full max-w-3xl mx-auto bg-white shadow-lg">
+        <div className="bg-custom-blue text-white p-3 rounded-t-lg text-center text-sm font-medium">
+          SOLICITUD DE RECLAMOS - MUNICIPALIDAD ELDORADO
         </div>
-        <p className="text-gray-500 text-sm">Complete el formulario con los detalles de su reclamo</p>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4 text-red-500 font-semibold text-sm">* Todos los campos son obligatorios</div>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="nombre"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre completo</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Su nombre" {...field} className="bg-gray-50" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="dni"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>DNI</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Su DNI" {...field} className="bg-gray-50" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Correo electrónico</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Su correo electrónico" {...field} className="bg-gray-50" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="telefono"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Teléfono</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Su número de teléfono" {...field} className="bg-gray-50" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <FormField
-              control={form.control}
-              name="fechaIncidente"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Fecha del incidente</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal bg-gray-50",
-                            !field.value && "text-muted-foreground",
-                          )}
-                        >
-                          {field.value ? format(field.value, "PPP", { locale: es }) : <span>Seleccione una fecha</span>}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                        initialFocus
-                        locale={es}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="grid grid-cols-1 gap-6">
-              <FormField
-                control={form.control}
-                name="sector"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Sector</FormLabel>
-                    <Select
-                      onValueChange={(value) => {
-                        field.onChange(value)
-                        setSector(value)
-                        setTema("")
-                        form.setValue("tema", "")
-                        form.setValue("subtema", "")
-                      }}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="bg-gray-50">
-                          <SelectValue placeholder="Seleccione un sector" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.keys(temasReclamos).map((sector) => (
-                          <SelectItem key={sector} value={sector}>
-                            {sector.charAt(0).toUpperCase() + sector.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            {sector && (
-              <FormField
-                control={form.control}
-                name="tema"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tema</FormLabel>
-                    <Select
-                      onValueChange={(value) => {
-                        field.onChange(value)
-                        setTema(value)
-                        form.setValue("subtema", "")
-                      }}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="bg-gray-50">
-                          <SelectValue placeholder="Seleccione un tema" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.keys(temasReclamos[sector as keyof typeof temasReclamos]).map((tema) => (
-                          <SelectItem key={tema} value={tema}>
-                            {tema.charAt(0).toUpperCase() + tema.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-            {tema &&
-              temasReclamos[sector as keyof typeof temasReclamos][
-                tema as keyof (typeof temasReclamos)[keyof typeof temasReclamos]
-              ].length > 0 && (
+        <CardHeader className="pb-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold">Nuevo Reclamo</h2>
+            <span className="text-gray-500 text-sm">
+              {new Date().toLocaleDateString("es-AR", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </span>
+          </div>
+          <p className="text-gray-500 text-sm">Complete el formulario con los detalles de su reclamo</p>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-4 text-red-500 font-semibold text-sm">* Todos los campos son obligatorios</div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="subtema"
+                  name="nombre"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Subtema</FormLabel>
-                      <Select onValueChange={field.onChange}>
+                      <FormLabel>Nombre completo</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Su nombre" {...field} className="bg-gray-50" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="dni"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>DNI</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Su DNI" {...field} className="bg-gray-50" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Correo electrónico</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Su correo electrónico" {...field} className="bg-gray-50" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="telefono"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Teléfono</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Su número de teléfono" {...field} className="bg-gray-50" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <FormField
+                control={form.control}
+                name="fechaIncidente"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Fecha del incidente</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full pl-3 text-left font-normal bg-gray-50",
+                              !field.value && "text-muted-foreground",
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP", { locale: es })
+                            ) : (
+                              <span>Seleccione una fecha</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                          initialFocus
+                          locale={es}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="grid grid-cols-1 gap-6">
+                <FormField
+                  control={form.control}
+                  name="sector"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sector</FormLabel>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value)
+                          setSector(value)
+                          setTema("")
+                          form.setValue("tema", "")
+                          form.setValue("subtema", "")
+                        }}
+                      >
                         <FormControl>
                           <SelectTrigger className="bg-gray-50">
-                            <SelectValue placeholder="Seleccione un subtema" />
+                            <SelectValue placeholder="Seleccione un sector" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {temasReclamos[sector as keyof typeof temasReclamos][
-                            tema as keyof (typeof temasReclamos)[keyof typeof temasReclamos]
-                          ].map((subtema) => (
-                            <SelectItem key={subtema} value={subtema}>
-                              {subtema.charAt(0).toUpperCase() + subtema.slice(1)}
+                          {Object.keys(temasReclamos).map((sector) => (
+                            <SelectItem key={sector} value={sector}>
+                              {sector.charAt(0).toUpperCase() + sector.slice(1)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              {sector && (
+                <FormField
+                  control={form.control}
+                  name="tema"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tema</FormLabel>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value)
+                          setTema(value)
+                          form.setValue("subtema", "")
+                        }}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="bg-gray-50">
+                            <SelectValue placeholder="Seleccione un tema" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {Object.keys(temasReclamos[sector as keyof typeof temasReclamos]).map((tema) => (
+                            <SelectItem key={tema} value={tema}>
+                              {tema.charAt(0).toUpperCase() + tema.slice(1)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -558,187 +547,219 @@ export function FormularioReclamos() {
                   )}
                 />
               )}
-            <FormField
-              control={form.control}
-              name="descripcion"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descripción</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Describa su reclamo" {...field} className="bg-gray-50 min-h-[100px]" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="space-y-4">
+              {tema &&
+                temasReclamos[sector as keyof typeof temasReclamos][
+                  tema as keyof (typeof temasReclamos)[keyof typeof temasReclamos]
+                ].length > 0 && (
+                  <FormField
+                    control={form.control}
+                    name="subtema"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Subtema</FormLabel>
+                        <Select onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger className="bg-gray-50">
+                              <SelectValue placeholder="Seleccione un subtema" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {temasReclamos[sector as keyof typeof temasReclamos][
+                              tema as keyof (typeof temasReclamos)[keyof typeof temasReclamos]
+                            ].map((subtema) => (
+                              <SelectItem key={subtema} value={subtema}>
+                                {subtema.charAt(0).toUpperCase() + subtema.slice(1)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
               <FormField
                 control={form.control}
-                name="ubicacion.texto"
+                name="descripcion"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Ubicación</FormLabel>
-                    <div className="flex items-center space-x-2">
-                      <FormControl>
-                        <Input placeholder="Describa la ubicación" {...field} className="bg-gray-50" />
-                      </FormControl>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={captureLocation}
-                        disabled={isCapturingLocation}
-                      >
-                        <MapPin className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <FormDescription>
-                      Ingrese la ubicación manualmente o haga clic en el botón para capturar su ubicación actual (si
-                      está disponible).
-                    </FormDescription>
+                    <FormLabel>Descripción</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Describa su reclamo" {...field} className="bg-gray-50 min-h-[100px]" />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </div>
-            <FormField
-              control={form.control}
-              name="archivos"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Archivos adjuntos (1 imagen obligatoria, máximo 2)</FormLabel>
-                  <FormDescription>Suba al menos 1 imagen relevante al reclamo (máximo 2)</FormDescription>
-                  <div
-                    {...getRootProps()}
-                    className={cn(
-                      "border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors",
-                      isDragActive ? "border-primary bg-primary/10" : "border-gray-300 hover:border-primary",
-                    )}
-                  >
-                    <input {...getInputProps()} />
-                    <div className="flex flex-col items-center">
-                      <Upload className="w-12 h-12 text-gray-400 mb-2" />
-                      <p className="text-sm text-gray-600">
-                        Arrastre y suelte imágenes aquí, o haga clic para seleccionar
-                      </p>
-                    </div>
-                  </div>
-                  <AnimatePresence>
-                    {imagePreviews.length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="mt-4 grid grid-cols-2 gap-4"
-                      >
-                        {imagePreviews.map((preview, index) => (
-                          <motion.div
-                            key={index}
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.8 }}
-                            className="relative group"
-                          >
-                            <img
-                              src={preview || "/placeholder.svg"}
-                              alt={`Preview ${index + 1}`}
-                              className="w-full h-32 object-cover rounded-lg"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeImage(index)}
-                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                              aria-label="Eliminar imagen"
-                            >
-                              <X size={16} />
-                            </button>
-                          </motion.div>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="recibirNotificaciones"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Recibir notificaciones</FormLabel>
-                    <FormDescription>Deseo recibir actualizaciones sobre el estado de mi reclamo</FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-            <div className="flex items-center justify-between pt-4 border-t">
-              <div className="flex space-x-6 text-sm text-gray-500">
-                <div className="flex items-center">
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  <span>0 Comentarios</span>
-                </div>
-                <div className="flex items-center">
-                  <Link2 className="w-4 h-4 mr-2" />
-                  <span>0 Enlaces</span>
-                </div>
-                <div className="flex items-center">
-                  <FileText className="w-4 h-4 mr-2" />
-                  <span>0 Archivos</span>
-                </div>
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="ubicacion.texto"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ubicación</FormLabel>
+                      <div className="flex items-center space-x-2">
+                        <FormControl>
+                          <Input placeholder="Describa la ubicación" {...field} className="bg-gray-50" />
+                        </FormControl>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={captureLocation}
+                          disabled={isCapturingLocation}
+                        >
+                          <MapPin className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <FormDescription>
+                        Ingrese la ubicación manualmente o haga clic en el botón para capturar su ubicación actual (si
+                        está disponible).
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
-              <Button
-                type="submit"
-                className="bg-custom-blue hover:bg-custom-blue-dark text-white"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <span className="animate-spin mr-2">⏳</span>
-                    Enviando...
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Enviar Reclamo
-                  </>
+              <FormField
+                control={form.control}
+                name="archivos"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Archivos adjuntos (1 imagen obligatoria, máximo 2)</FormLabel>
+                    <FormDescription>Suba al menos 1 imagen relevante al reclamo (máximo 2)</FormDescription>
+                    <div
+                      {...getRootProps()}
+                      className={cn(
+                        "border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors",
+                        isDragActive ? "border-primary bg-primary/10" : "border-gray-300 hover:border-primary",
+                      )}
+                    >
+                      <input {...getInputProps()} />
+                      <div className="flex flex-col items-center">
+                        <Upload className="w-12 h-12 text-gray-400 mb-2" />
+                        <p className="text-sm text-gray-600">
+                          Arrastre y suelte imágenes aquí, o haga clic para seleccionar
+                        </p>
+                      </div>
+                    </div>
+                    <AnimatePresence>
+                      {imagePreviews.length > 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="mt-4 grid grid-cols-2 gap-4"
+                        >
+                          {imagePreviews.map((preview, index) => (
+                            <motion.div
+                              key={index}
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.8 }}
+                              className="relative group"
+                            >
+                              <img
+                                src={preview || "/placeholder.svg"}
+                                alt={`Preview ${index + 1}`}
+                                className="w-full h-32 object-cover rounded-lg"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeImage(index)}
+                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                aria-label="Eliminar imagen"
+                              >
+                                <X size={16} />
+                              </button>
+                            </motion.div>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </Button>
+              />
+              <FormField
+                control={form.control}
+                name="recibirNotificaciones"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Recibir notificaciones</FormLabel>
+                      <FormDescription>Deseo recibir actualizaciones sobre el estado de mi reclamo</FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <div className="flex items-center justify-between pt-4 border-t">
+                <div className="flex space-x-6 text-sm text-gray-500">
+                  <div className="flex items-center">
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    <span>0 Comentarios</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Link2 className="w-4 h-4 mr-2" />
+                    <span>0 Enlaces</span>
+                  </div>
+                  <div className="flex items-center">
+                    <FileText className="w-4 h-4 mr-2" />
+                    <span>0 Archivos</span>
+                  </div>
+                </div>
+                <Button
+                  type="submit"
+                  className="bg-custom-blue hover:bg-custom-blue-dark text-white"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="animate-spin mr-2">⏳</span>
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Enviar Reclamo
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Reclamo Enviado Exitosamente</DialogTitle>
+              <DialogDescription>Su reclamo ha sido recibido y procesado correctamente.</DialogDescription>
+            </DialogHeader>
+            <div className="mt-4">
+              <p className="text-sm text-gray-500">
+                Gracias por comunicarse con nosotros. Su reclamo ha sido registrado en nuestro sistema.
+              </p>
+              <p className="mt-2 font-semibold">
+                Número de seguimiento: <span className="text-blue-600">{reclamoId}</span>
+              </p>
+              <p className="mt-4 text-sm text-gray-500">
+                Por favor, guarde este número para futuras referencias. Lo utilizará para consultar el estado de su
+                reclamo.
+              </p>
             </div>
-          </form>
-        </Form>
-      </CardContent>
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Reclamo Enviado Exitosamente</DialogTitle>
-            <DialogDescription>Su reclamo ha sido recibido y procesado correctamente.</DialogDescription>
-          </DialogHeader>
-          <div className="mt-4">
-            <p className="text-sm text-gray-500">
-              Gracias por comunicarse con nosotros. Su reclamo ha sido registrado en nuestro sistema.
-            </p>
-            <p className="mt-2 font-semibold">
-              Número de seguimiento: <span className="text-blue-600">{reclamoId}</span>
-            </p>
-            <p className="mt-4 text-sm text-gray-500">
-              Por favor, guarde este número para futuras referencias. Lo utilizará para consultar el estado de su
-              reclamo.
-            </p>
-          </div>
-          <Button
-            className="mt-4 w-full bg-custom-blue hover:bg-custom-blue-dark text-white"
-            onClick={() => setIsDialogOpen(false)}
-          >
-            Entendido
-          </Button>
-        </DialogContent>
-      </Dialog>
-    </Card>
+            <Button
+              className="mt-4 w-full bg-custom-blue hover:bg-custom-blue-dark text-white"
+              onClick={() => setIsDialogOpen(false)}
+            >
+              Entendido
+            </Button>
+          </DialogContent>
+        </Dialog>
+      </Card>
+    </>
   )
 }
 
