@@ -83,7 +83,7 @@ const FloatingButton = () => (
     rel="noopener noreferrer"
     className="fixed top-4 right-4 z-50 bg-custom-blue hover:bg-custom-blue-dark text-white font-bold py-2 px-4 rounded-full shadow-lg flex items-center transition-colors duration-200"
   >
-    Ver tutorial
+    Ver Video tutorial
     <ExternalLink className="ml-2 h-4 w-4" />
   </a>
 )
